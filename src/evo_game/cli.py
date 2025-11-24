@@ -19,13 +19,10 @@ def train(
     show_sensors: bool | None = typer.Option(
         None, help="Override whether sensor overlays are drawn when rendering."
     ),
-    show_trails: bool | None = typer.Option(None, help="Render motion trails for the best agent."),
 ) -> None:
     """Run evolutionary training."""
 
-    neat_runner.run_training(
-        generations, render=render, config_path=config, show_sensors=show_sensors, show_trails=show_trails
-    )
+    neat_runner.run_training(generations, render=render, config_path=config, show_sensors=show_sensors)
 
 
 @app.command(name="visualize-best")
@@ -34,11 +31,10 @@ def visualize_best(
     show_sensors: bool | None = typer.Option(
         None, help="Override whether sensor overlays are drawn when rendering."
     ),
-    show_trails: bool | None = typer.Option(None, help="Render motion trails for the best agent."),
 ) -> None:
     """Visualize the best saved genome."""
 
-    neat_runner.run_best(render=True, config_path=config, show_sensors=show_sensors, show_trails=show_trails)
+    neat_runner.run_best(render=True, config_path=config, show_sensors=show_sensors)
 
 
 @app.command()
@@ -48,11 +44,10 @@ def resume(
     show_sensors: bool | None = typer.Option(
         None, help="Override whether sensor overlays are drawn when rendering."
     ),
-    show_trails: bool | None = typer.Option(None, help="Render motion trails for the best agent."),
 ) -> None:
     """Resume training from the last checkpoint."""
 
-    neat_runner.resume_training(render=render, config_path=config, show_sensors=show_sensors, show_trails=show_trails)
+    neat_runner.resume_training(render=render, config_path=config, show_sensors=show_sensors)
 
 
 @app.command(name="export-config")
