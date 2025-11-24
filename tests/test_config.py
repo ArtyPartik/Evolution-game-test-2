@@ -2,7 +2,7 @@ from pathlib import Path
 
 from pathlib import Path
 
-from evo_game.config import AppConfig, load_config
+from evo_game.config import AppConfig, load_config, write_default_config
 
 
 def test_load_default_config() -> None:
@@ -38,4 +38,15 @@ neat_config_path = "neat-config.cfg"
     assert config.world.width == 640
     assert config.population.population_size == 5
     assert config.neat_config_path == Path("neat-config.cfg")
+    assert config.render.show_sensors is False
+
+
+def test_write_default_config(tmp_path: Path) -> None:
+    destination = tmp_path / "config.toml"
+    written = write_default_config(destination)
+
+    assert written == destination
+    generated = load_config(destination)
+    assert isinstance(generated, AppConfig)
+    assert generated.render.show_sensors is False
 
