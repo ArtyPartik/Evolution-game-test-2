@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 from pydantic import BaseModel, Field
-import tomli_w
 
 import sys
 
@@ -54,6 +53,12 @@ class PopulationSettings(BaseModel):
     checkpoint_dir: Path = Field(Path("checkpoints"), description="Directory for checkpoint files.")
 
 
+class RenderSettings(BaseModel):
+    """Optional rendering controls."""
+
+    show_sensors: bool = Field(False, description="Draw basic sensor overlays when rendering.")
+
+
 class AppConfig(BaseModel):
     """Top-level configuration container."""
 
@@ -61,6 +66,7 @@ class AppConfig(BaseModel):
     world: WorldSettings = WorldSettings()
     population: PopulationSettings = PopulationSettings()
     neat_config_path: Path = Field(Path("neat-config.cfg"), description="Path to NEAT configuration file.")
+    render: RenderSettings = Field(default_factory=RenderSettings)
 
 
 def load_config(config_path: Optional[Path | str] = None) -> AppConfig:
@@ -87,4 +93,29 @@ def cast_dict(raw: Dict[str, Any]) -> Dict[str, Any]:
     """Convert nested dict keys to match AppConfig structure."""
 
     return raw
+
+
+def write_default_config(path: Path, overwrite: bool = False) -> Path:
+    """Write the default configuration to a TOML file.
+
+    Args:
+        path: Destination path for the generated TOML file.
+        overwrite: Whether to replace an existing file.
+
+    Returns:
+        Path: The path that was written.
+    """
+
+    destination = Path(path)
+    if destination.exists() and not overwrite:
+        raise FileExistsError(f"{destination} already exists. Use --overwrite to replace it.")
+
+    # Import locally so consumers who only read configs do not require the
+    # optional writer dependency until they actually generate a file.
+    from tomli_w import dumps
+
+    config = AppConfig()
+    payload = config.model_dump(mode="json")
+    destination.write_text(dumps(payload))
+    return destination
 

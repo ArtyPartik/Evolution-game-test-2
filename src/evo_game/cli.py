@@ -16,29 +16,38 @@ def train(
     generations: int = typer.Option(10, help="Number of generations to train."),
     render: bool = typer.Option(False, help="Render the simulation while training."),
     config: Path | None = typer.Option(None, help="Path to a TOML config file."),
+    show_sensors: bool | None = typer.Option(
+        None, help="Override whether sensor overlays are drawn when rendering."
+    ),
 ) -> None:
     """Run evolutionary training."""
 
-    neat_runner.run_training(generations, render=render, config_path=config)
+    neat_runner.run_training(generations, render=render, config_path=config, show_sensors=show_sensors)
 
 
 @app.command(name="visualize-best")
 def visualize_best(
     config: Path | None = typer.Option(None, help="Path to a TOML config file."),
+    show_sensors: bool | None = typer.Option(
+        None, help="Override whether sensor overlays are drawn when rendering."
+    ),
 ) -> None:
     """Visualize the best saved genome."""
 
-    neat_runner.run_best(render=True, config_path=config)
+    neat_runner.run_best(render=True, config_path=config, show_sensors=show_sensors)
 
 
 @app.command()
 def resume(
     render: bool = typer.Option(False, help="Render while resuming training."),
     config: Path | None = typer.Option(None, help="Path to a TOML config file."),
+    show_sensors: bool | None = typer.Option(
+        None, help="Override whether sensor overlays are drawn when rendering."
+    ),
 ) -> None:
     """Resume training from the last checkpoint."""
 
-    neat_runner.resume_training(render=render, config_path=config)
+    neat_runner.resume_training(render=render, config_path=config, show_sensors=show_sensors)
 
 
 @app.command(name="export-config")
