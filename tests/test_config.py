@@ -2,14 +2,17 @@ from pathlib import Path
 
 from pathlib import Path
 
-from evo_game.config import AppConfig, load_config
+from evo_game.config import AppConfig, load_config, write_default_config
 
 
 def test_load_default_config() -> None:
     config = load_config(None)
     assert isinstance(config, AppConfig)
     assert config.simulation.ticks_per_second == 60
+    assert config.simulation.energy_per_force == 0.002
     assert config.world.width == 800.0
+    assert config.world.hazards
+    assert config.render.show_trails is True
 
 
 def test_load_from_file(tmp_path: Path) -> None:
@@ -38,4 +41,17 @@ neat_config_path = "neat-config.cfg"
     assert config.world.width == 640
     assert config.population.population_size == 5
     assert config.neat_config_path == Path("neat-config.cfg")
+    assert config.render.show_sensors is False
+    assert config.render.show_trails is True
+
+
+def test_write_default_config(tmp_path: Path) -> None:
+    destination = tmp_path / "config.toml"
+    written = write_default_config(destination)
+
+    assert written == destination
+    generated = load_config(destination)
+    assert isinstance(generated, AppConfig)
+    assert generated.render.show_sensors is False
+    assert generated.render.show_trails is True
 
