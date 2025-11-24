@@ -23,6 +23,7 @@ class Renderer:
         pygame.display.set_caption("Evolution Game")
         self.clock = pygame.time.Clock()
         self.trails: dict[int, List[tuple[int, int]]] = {}
+        self.paused: bool = False
 
     def handle_events(self) -> bool:
         for event in pygame.event.get():
@@ -118,4 +119,23 @@ class Renderer:
             (agent.body.position.x + velocity.x * 0.15, agent.body.position.y + velocity.y * 0.15)
         )
         pygame.draw.line(self.screen, (140, 220, 220), origin, velocity_tip, 1)
+
+    def _draw_trails(self, best_agent: Agent) -> None:
+        points = self.trails.get(id(best_agent), [])
+        if len(points) > 1:
+            pygame.draw.lines(self.screen, (90, 200, 200), False, points, 2)
+
+    def _update_trails(self, best_agent: Agent) -> None:
+        key = id(best_agent)
+        trail = self.trails.setdefault(key, [])
+        trail.append(self._to_screen(best_agent.body.position))
+        max_length = 200
+        if len(trail) > max_length:
+            del trail[:-max_length]
+
+    def _best_agent(self) -> Agent | None:
+        living = [a for a in self.agents if a.alive]
+        if not living:
+            return None
+        return max(living, key=lambda a: a.fitness)
 
