@@ -42,7 +42,6 @@ neat_config_path = "neat-config.cfg"
     assert config.population.population_size == 5
     assert config.neat_config_path == Path("neat-config.cfg")
     assert config.render.show_sensors is False
-    assert config.render.show_trails is True
 
 
 def test_write_default_config(tmp_path: Path) -> None:
@@ -53,5 +52,4 @@ def test_write_default_config(tmp_path: Path) -> None:
     generated = load_config(destination)
     assert isinstance(generated, AppConfig)
     assert generated.render.show_sensors is False
-    assert generated.render.show_trails is True
 

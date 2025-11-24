@@ -36,18 +36,6 @@ Enable lightweight sensor overlays during rendering when debugging behavior:
 python -m evo_game.main train --render --show-sensors
 ```
 
-Highlight the leading agent with motion trails during visualization:
-```bash
-python -m evo_game.main visualize-best --show-trails
-```
-
-### Rendering controls
-When rendering is enabled, you can toggle overlays without restarting:
-
-- Press **S** to toggle sensor guides on or off.
-- Press **T** to toggle trails for the leading agent.
-- Press **Space** to pause/resume the simulation for closer inspection.
-
 Visualize the best saved genome:
 ```bash
 python -m evo_game.main visualize-best

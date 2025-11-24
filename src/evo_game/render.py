@@ -23,7 +23,6 @@ class Renderer:
         pygame.display.set_caption("Evolution Game")
         self.clock = pygame.time.Clock()
         self.trails: dict[int, List[tuple[int, int]]] = {}
-        self.paused: bool = False
 
     def handle_events(self) -> bool:
         for event in pygame.event.get():
@@ -88,8 +87,6 @@ class Renderer:
             if agent is best_agent:
                 color = (90, 220, 180)
             pygame.draw.circle(self.screen, color, pos, int(agent.sim_settings.agent_radius))
-            if agent is best_agent:
-                pygame.draw.circle(self.screen, (240, 230, 120), pos, int(agent.sim_settings.agent_radius) + 3, 1)
             if self.app_config.render.show_sensors:
                 self._draw_sensors(agent)
 
@@ -102,9 +99,6 @@ class Renderer:
             f"Step: {step}",
             f"Best fitness: {best_fitness:.2f}",
             f"Alive: {alive_count}/{len(self.agents)} | Best energy: {best_energy:.1f}",
-            f"Sensors: {'on' if self.app_config.render.show_sensors else 'off'} | "
-            f"Trails: {'on' if self.app_config.render.show_trails else 'off'}",
-            "Paused: press SPACE to resume" if self.paused else "Press SPACE to pause",
         ]
         for i, text in enumerate(lines):
             surface = font.render(text, True, (230, 230, 230))
@@ -124,25 +118,4 @@ class Renderer:
             (agent.body.position.x + velocity.x * 0.15, agent.body.position.y + velocity.y * 0.15)
         )
         pygame.draw.line(self.screen, (140, 220, 220), origin, velocity_tip, 1)
-
-    def _update_trails(self, best_agent: Agent) -> None:
-        agent_id = id(best_agent)
-        trail = self.trails.setdefault(agent_id, [])
-        trail.append(self._to_screen(best_agent.body.position))
-        max_length = 60
-        if len(trail) > max_length:
-            del trail[: len(trail) - max_length]
-        self.trails = {agent_id: trail}
-
-    def _draw_trails(self, best_agent: Agent) -> None:
-        agent_id = id(best_agent)
-        trail = self.trails.get(agent_id, [])
-        if len(trail) > 1:
-            pygame.draw.lines(self.screen, (160, 200, 255), False, trail, 2)
-
-    def _best_agent(self) -> Agent | None:
-        alive = [a for a in self.agents if a.alive]
-        if not alive:
-            return None
-        return max(alive, key=lambda a: a.fitness)
 
