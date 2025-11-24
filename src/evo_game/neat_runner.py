@@ -28,10 +28,17 @@ def _evaluate_genomes(genomes, neat_config: neat.Config, app_config: AppConfig, 
     simulation.run()
 
 
-def run_training(num_generations: int, render: bool = False, config_path: Optional[Path] = None) -> None:
+def run_training(
+    num_generations: int,
+    render: bool = False,
+    config_path: Optional[Path] = None,
+    show_sensors: bool | None = None,
+) -> None:
     """Run training for a set number of generations."""
 
     app_config = load_config(config_path)
+    if show_sensors is not None:
+        app_config.render.show_sensors = show_sensors
     neat_config = _load_neat_config(app_config.neat_config_path)
 
     population = neat.Population(neat_config)
@@ -49,10 +56,12 @@ def run_training(num_generations: int, render: bool = False, config_path: Option
     print(f"Training finished. Best genome saved to {best_path}")
 
 
-def run_best(render: bool = True, config_path: Optional[Path] = None) -> None:
+def run_best(render: bool = True, config_path: Optional[Path] = None, show_sensors: bool | None = None) -> None:
     """Load the best genome from checkpoint and run a demo."""
 
     app_config = load_config(config_path)
+    if show_sensors is not None:
+        app_config.render.show_sensors = show_sensors
     checkpoint_dir = app_config.population.checkpoint_dir
     best_path = checkpoint_dir / "best-genome.pkl"
     if not best_path.exists():
@@ -67,10 +76,12 @@ def run_best(render: bool = True, config_path: Optional[Path] = None) -> None:
     simulation.run()
 
 
-def resume_training(render: bool = False, config_path: Optional[Path] = None) -> None:
+def resume_training(render: bool = False, config_path: Optional[Path] = None, show_sensors: bool | None = None) -> None:
     """Resume training from the latest checkpoint."""
 
     app_config = load_config(config_path)
+    if show_sensors is not None:
+        app_config.render.show_sensors = show_sensors
     checkpoint_dir = app_config.population.checkpoint_dir
     latest = _find_latest_checkpoint(checkpoint_dir)
     if not latest:

@@ -6,6 +6,7 @@ from typing import List
 import pygame
 import pymunk
 
+from .agent import Agent
 from .config import AppConfig
 from .world import World
 
@@ -58,6 +59,8 @@ class Renderer:
             pos = self._to_screen(agent.body.position)
             color = (80, 200, 120) if agent.alive else (120, 120, 120)
             pygame.draw.circle(self.screen, color, pos, int(agent.sim_settings.agent_radius))
+            if self.app_config.render.show_sensors:
+                self._draw_sensors(agent)
 
     def _draw_hud(self, generation: int, step: int, best_fitness: float) -> None:
         font = pygame.font.SysFont("arial", 18)
@@ -69,4 +72,19 @@ class Renderer:
         for i, text in enumerate(lines):
             surface = font.render(text, True, (230, 230, 230))
             self.screen.blit(surface, (10, 10 + i * 20))
+
+    def _draw_sensors(self, agent: Agent) -> None:
+        origin = self._to_screen(agent.body.position)
+
+        target = self._to_screen(self.world.target_body.position)
+        pygame.draw.line(self.screen, (210, 180, 90), origin, target, 1)
+
+        ground_point = self._to_screen((agent.body.position.x, self.world.settings.ground_height))
+        pygame.draw.line(self.screen, (120, 160, 240), origin, ground_point, 1)
+
+        velocity = agent.body.velocity
+        velocity_tip = self._to_screen(
+            (agent.body.position.x + velocity.x * 0.15, agent.body.position.y + velocity.y * 0.15)
+        )
+        pygame.draw.line(self.screen, (140, 220, 220), origin, velocity_tip, 1)
 

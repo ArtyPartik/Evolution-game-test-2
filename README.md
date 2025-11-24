@@ -31,6 +31,11 @@ Train for a few generations (enable `--render` to watch):
 python -m evo_game.main train --generations 10 --render
 ```
 
+Enable lightweight sensor overlays during rendering when debugging behavior:
+```bash
+python -m evo_game.main train --render --show-sensors
+```
+
 Visualize the best saved genome:
 ```bash
 python -m evo_game.main visualize-best
