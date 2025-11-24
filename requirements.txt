@@ -5,3 +5,4 @@ typer
 pydantic
 pytest
 tomli
+tomli-w

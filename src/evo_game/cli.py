@@ -6,6 +6,7 @@ from pathlib import Path
 import typer
 
 from . import neat_runner
+from .config import write_default_config
 
 app = typer.Typer(help="Command line interface for the evolution game.")
 
@@ -38,6 +39,22 @@ def resume(
     """Resume training from the last checkpoint."""
 
     neat_runner.resume_training(render=render, config_path=config)
+
+
+@app.command(name="export-config")
+def export_config(
+    path: Path = typer.Option(Path("config.toml"), help="Where to write the default TOML config."),
+    overwrite: bool = typer.Option(False, help="Overwrite an existing file."),
+) -> None:
+    """Write a default configuration file to disk."""
+
+    try:
+        destination = write_default_config(path, overwrite=overwrite)
+    except FileExistsError as exc:  # pragma: no cover - exercised via CLI usage
+        typer.echo(str(exc))
+        raise typer.Exit(code=1)
+
+    typer.echo(f"Wrote default config to {destination}")
 
 
 if __name__ == "__main__":
