@@ -110,12 +110,8 @@ def write_default_config(path: Path, overwrite: bool = False) -> Path:
     if destination.exists() and not overwrite:
         raise FileExistsError(f"{destination} already exists. Use --overwrite to replace it.")
 
-    # Import locally so consumers who only read configs do not require the
-    # optional writer dependency until they actually generate a file.
-    from tomli_w import dumps
-
     config = AppConfig()
     payload = config.model_dump(mode="json")
-    destination.write_text(dumps(payload))
+    destination.write_text(tomli_w.dumps(payload))
     return destination
 
