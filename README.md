@@ -58,6 +58,7 @@ python -m evo_game.main resume --render
 ## Suggested next steps
 See `docs/further_actions.md` for a concise list of improvements to gameplay, sensors, rendering, and tooling that can guide future iterations.
 
+
 ## Running tests
 ```bash
 pytest
