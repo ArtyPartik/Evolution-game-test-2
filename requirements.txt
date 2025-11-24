@@ -1,0 +1,7 @@
+pygame
+pymunk
+neat-python
+typer
+pydantic
+pytest
+tomli
