@@ -28,6 +28,13 @@ class Renderer:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_s:
+                    self.app_config.render.show_sensors = not self.app_config.render.show_sensors
+                elif event.key == pygame.K_t:
+                    self.app_config.render.show_trails = not self.app_config.render.show_trails
+                elif event.key == pygame.K_SPACE:
+                    self.paused = not self.paused
         return True
 
     def _to_screen(self, position: pymunk.Vec2d | tuple[float, float]) -> tuple[int, int]:
