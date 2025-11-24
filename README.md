@@ -52,8 +52,12 @@ python -m evo_game.main resume --render
 - `src/evo_game/` – core modules (`config`, `world`, `agent`, `simulation`, `render`, `neat_runner`, `cli`).
 - `src/main.py` – entry point used by `python -m evo_game.main`.
 - `checkpoints/` – checkpoints and best genome files.
-- `docs/` – architecture and extension notes.
+- `docs/` – architecture, extension notes, and follow-up ideas.
 - `tests/` – pytest-based sanity tests.
+
+## Suggested next steps
+See `docs/further_actions.md` for a concise list of improvements to gameplay, sensors, rendering, and tooling that can guide future iterations.
+
 
 ## Running tests
 ```bash
