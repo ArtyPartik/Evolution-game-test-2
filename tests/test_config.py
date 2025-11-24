@@ -9,7 +9,10 @@ def test_load_default_config() -> None:
     config = load_config(None)
     assert isinstance(config, AppConfig)
     assert config.simulation.ticks_per_second == 60
+    assert config.simulation.energy_per_force == 0.002
     assert config.world.width == 800.0
+    assert config.world.hazards
+    assert config.render.show_trails is True
 
 
 def test_load_from_file(tmp_path: Path) -> None:

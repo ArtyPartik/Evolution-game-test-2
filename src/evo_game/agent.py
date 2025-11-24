@@ -33,6 +33,7 @@ class Agent:
         self.fitness: float = 0.0
         self.best_distance: float | None = None
         self.initial_distance: float = self._distance_to_target()
+        self.energy: float = sim_settings.max_energy
 
     def _distance_to_target(self) -> float:
         target = Vec2d(*self.world.target_body.position)
@@ -50,8 +51,10 @@ class Agent:
         vx = velocity.x / self.sim_settings.sensor_range
         vy = velocity.y / self.sim_settings.sensor_range
         ground_dist = (position.y - self.world.settings.ground_height) / self.world.settings.height
+        hazard_dist = self.world.hazard_distance(position)
+        target_velocity = self.world.target_body.velocity.x / max(1.0, self.sim_settings.sensor_range)
 
-        return [dx, dy, vx, vy, ground_dist]
+        return [dx, dy, vx, vy, ground_dist, hazard_dist, target_velocity]
 
     def update(self, dt: float, network: neat.nn.FeedForwardNetwork) -> None:
         """Update the agent using the provided NEAT network."""
@@ -66,8 +69,11 @@ class Agent:
 
         self.body.apply_force_at_local_point((force_x, 0.0))
 
+        self._consume_energy(abs(force_x) * self.sim_settings.energy_per_force)
+
         if self._can_jump() and jump_signal > 0.5:
             self.body.apply_impulse_at_local_point((0.0, self.sim_settings.jump_impulse))
+            self._consume_energy(self.sim_settings.energy_per_jump)
 
         current_distance = self._distance_to_target()
         if self.best_distance is None or current_distance < self.best_distance:
@@ -77,11 +83,31 @@ class Agent:
 
         self.fitness += dt  # small reward for staying alive
 
+        self._check_hazards()
+
         if position_below_floor(self.body, self.world.settings):
             self.alive = False
 
     def _can_jump(self) -> bool:
         return self.body.position.y <= self.world.settings.ground_height + self.sim_settings.agent_radius + 2.0
+
+    def _check_hazards(self) -> None:
+        if not self.world.hazards:
+            return
+
+        pos = Vec2d(*self.body.position)
+        for hazard in self.world.hazards:
+            vertices = [v + hazard.body.position for v in hazard.get_vertices()]  # type: ignore[arg-type]
+            xs = [p.x for p in vertices]
+            ys = [p.y for p in vertices]
+            if min(xs) <= pos.x <= max(xs) and min(ys) <= pos.y <= max(ys):
+                self.alive = False
+                return
+
+    def _consume_energy(self, amount: float) -> None:
+        self.energy -= amount
+        if self.energy <= 0:
+            self.alive = False
 
 
 def position_below_floor(body: pymunk.Body, settings: WorldSettings) -> bool:

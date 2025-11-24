@@ -3,10 +3,10 @@
 A small but well-architected 2D evolution sandbox built with Python, `pygame`, `pymunk`, and `neat-python`. Simple physics-driven creatures learn to move toward a target through neuroevolution.
 
 ## Features
-- 2D physics world with gravity, boundaries, and obstacles (`pymunk`).
-- Creatures controlled by NEAT neural networks.
-- Fitness-based evolution over generations with checkpointing/resume support.
-- Headless training or visual training via `pygame` rendering.
+- 2D physics world with gravity, boundaries, moving targets, obstacles, and hazards (`pymunk`).
+- Creatures controlled by NEAT neural networks with richer sensors (hazard proximity, target velocity).
+- Fitness-based evolution over generations with checkpointing/resume support and energy budgets.
+- Headless training or visual training via `pygame` rendering, including optional sensor overlays and motion trails.
 - Configurable via Pydantic models and optional `config.toml`.
 
 ## Installation

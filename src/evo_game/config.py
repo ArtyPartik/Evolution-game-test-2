@@ -23,6 +23,9 @@ class SimulationSettings(BaseModel):
     move_force: float = Field(500.0, description="Force applied for horizontal movement.")
     jump_impulse: float = Field(1500.0, description="Impulse applied when jumping.")
     agent_radius: float = Field(12.0, description="Radius of the circular agent.")
+    energy_per_force: float = Field(0.002, description="Energy cost per unit of applied horizontal force.")
+    energy_per_jump: float = Field(0.5, description="Energy cost per jump.")
+    max_energy: float = Field(15.0, description="Total energy budget before the agent exhausts.")
 
 
 class WorldSettings(BaseModel):
@@ -40,7 +43,15 @@ class WorldSettings(BaseModel):
         ),
         description="Rectangular obstacles represented as (x, y, width, height).",
     )
+    hazards: Tuple[Tuple[float, float, float, float], ...] = Field(
+        ((520.0, 70.0, 120.0, 16.0),),
+        description="Hazard rectangles (x, y, width, height) that eliminate agents on contact.",
+    )
     target_position: Tuple[float, float] = Field((700.0, 100.0), description="X/Y target position.")
+    target_motion_amplitude: float = Field(
+        80.0, description="Horizontal oscillation amplitude for the target (0 to disable)."
+    )
+    target_motion_speed: float = Field(1.5, description="Speed multiplier for the moving target.")
 
 
 class PopulationSettings(BaseModel):
