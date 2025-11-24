@@ -68,6 +68,7 @@ class RenderSettings(BaseModel):
     """Optional rendering controls."""
 
     show_sensors: bool = Field(False, description="Draw basic sensor overlays when rendering.")
+    show_trails: bool = Field(True, description="Draw motion trails for the best-performing agent.")
 
 
 class AppConfig(BaseModel):
@@ -106,6 +107,40 @@ def cast_dict(raw: Dict[str, Any]) -> Dict[str, Any]:
     return raw
 
 
+def _format_value(value: Any) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, (str, Path)):
+        return f'"{value}"'
+    if isinstance(value, (list, tuple)):
+        inner = ", ".join(_format_value(v) for v in value)
+        return f"[{inner}]"
+    if isinstance(value, dict):
+        raise ValueError("Nested dictionaries should be handled by the caller.")
+    return f'"{value}"'
+
+
+def _to_toml(data: Dict[str, Any]) -> str:
+    """Render a shallow dict-of-dicts to TOML for default config export."""
+
+    lines: list[str] = []
+    for key, value in data.items():
+        if isinstance(value, dict):
+            lines.append(f"[{key}]")
+            for inner_key, inner_value in value.items():
+                lines.append(f"{inner_key} = {_format_value(inner_value)}")
+            lines.append("")
+        else:
+            lines.append(f"{key} = {_format_value(value)}")
+
+    while lines and lines[-1] == "":
+        lines.pop()
+
+    return "\n".join(lines)
+
+
 def write_default_config(path: Path, overwrite: bool = False) -> Path:
     """Write the default configuration to a TOML file.
 
@@ -123,6 +158,6 @@ def write_default_config(path: Path, overwrite: bool = False) -> Path:
 
     config = AppConfig()
     payload = config.model_dump(mode="json")
-    destination.write_text(tomli_w.dumps(payload))
+    destination.write_text(_to_toml(payload))
     return destination
 
