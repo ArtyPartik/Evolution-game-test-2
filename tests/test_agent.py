@@ -14,8 +14,9 @@ def test_agent_creation_and_sensors() -> None:
     agent = Agent(world, config.simulation)
 
     sensors = agent.get_sensor_values()
-    assert len(sensors) == 5
+    assert len(sensors) == 7
     assert all(isinstance(v, float) for v in sensors)
+    assert sensors[-2] <= 1.0  # hazard distance normalized
 
 
 def test_agent_update_does_not_crash() -> None:

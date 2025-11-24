@@ -40,10 +40,16 @@ class Simulation:
     def run(self) -> None:
         dt = 1.0 / self.app_config.simulation.ticks_per_second
         max_steps = self.app_config.simulation.max_steps
+        step = 0
+        best_fitness = 0.0
 
-        for step in range(max_steps):
-            if self.renderer and not self.renderer.handle_events():
-                break
+        while step < max_steps:
+            if self.renderer:
+                if not self.renderer.handle_events():
+                    break
+                if self.renderer.paused:
+                    self.renderer.draw(self.generation, step, best_fitness)
+                    continue
 
             all_dead = True
             for agent, network in zip(self.agents, self.networks):
@@ -54,12 +60,15 @@ class Simulation:
 
             self.world.step(dt)
 
+            best_fitness = max((a.fitness for a in self.agents), default=0.0)
+
             if self.renderer:
-                best = max((a.fitness for a in self.agents), default=0.0)
-                self.renderer.draw(self.generation, step, best)
+                self.renderer.draw(self.generation, step, best_fitness)
 
             if all_dead:
                 break
+
+            step += 1
 
         for (_, genome), agent in zip(self.genomes, self.agents):
             genome.fitness = max(agent.fitness, 0.0)
